@@ -1,10 +1,17 @@
 import time
-
+import csv
+import json
+from DataStructures.List import array_list as lt
+from DataStructures.Map import map_linear_probing as mp
+from DataStructures.Map import map_functions as mf
+from DataStructures.Tree import red_black_tree as rb
 def new_logic():
     """
     Crea el catalogo para almacenar las estructuras de datos
     """
-    #TODO: Llama a las funciónes de creación de las estructuras de datos
+    catalog = {"accidents":None}
+    catalog["accidents"] = lt.new_list()
+    
     pass
 
 
@@ -14,8 +21,37 @@ def load_data(catalog, filename):
     """
     Carga los datos del reto
     """
-    # TODO: Realizar la carga de datos
-    pass
+    movies = csv.DictReader(open(".\\Data\\Challenge-3\\"+filename, encoding='utf-8'))
+    for elemento in movies:
+        
+        rta = {}
+        rta['ID'] = elemento['ID']
+        rta['Source'] =  elemento['Source']
+        rta['Severity'] = elemento['Severity']
+        rta['Start_Time'] = elemento['Start_Time']
+        rta['End_Time'] = elemento['End_Time']
+        rta['Start_Lat'] = elemento['Start_Lat']
+        rta['Start_Lng'] = elemento['Start_Lng']
+        rta['End_Lat'] = elemento['End_Lat']
+        rta['End_Lng'] = elemento['End_Lng']
+        rta['Distance(mi)'] = elemento['Distance(mi)']
+        rta['Description'] = elemento['Description']
+        rta['Street'] = elemento['Street']
+        rta['City'] = elemento['City']
+        rta['County'] = elemento['County']
+        rta['State'] = elemento['State']
+        rta['Temperature(F)'] = elemento['Temperature(F)']
+        rta['Wind_Chill(F)'] = elemento['Wind_Chill(F)']
+        rta['Humidity(%)'] = elemento['Humidity(%)']
+        rta['Pressure(in)'] = elemento['Pressure(in)']
+        rta['Visibility(mi)'] = elemento['Visibility(mi)']
+        rta['Wind_Direction'] = elemento['Wind_Direction']
+        rta['Wind_Speed(mph)'] = elemento['Wind_Speed(mph)']
+        rta['Precipitation(in)'] = elemento['Precipitation(in)']
+        rta['Weather_Condition'] = elemento['Weather_Condition']
+        lt.add_last(catalog["accidents"],rta)
+    return catalog
+    
 
 # Funciones de consulta sobre el catálogo
 

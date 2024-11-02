@@ -1,12 +1,16 @@
 import sys
-
+from App import logic as logic
+from itertools import islice
+from DataStructures.List import array_list as lt
+from DataStructures.Map import map_linear_probing as mp
+import time
 
 def new_logic():
     """
         Se crea una instancia del controlador
     """
-    #TODO: Llamar la función de la lógica donde se crean las estructuras de datos
-    pass
+    control = logic.new_logic()
+    return control
 
 def print_menu():
     print("Bienvenido")
@@ -25,7 +29,10 @@ def load_data(control):
     """
     Carga los datos
     """
-    #TODO: Realizar la carga de datos
+    filename = input("Ingrese el nombre del archivo (con el .csv): ")
+    catalog = logic.load_data(control,filename)
+    print(catalog["accidents"])
+    
     pass
 
 
