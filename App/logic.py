@@ -12,7 +12,7 @@ def new_logic():
     catalog = {"accidents":None}
     catalog["accidents"] = lt.new_list()
     
-    pass
+    return catalog
 
 
 # Funciones para la carga de datos
@@ -21,7 +21,7 @@ def load_data(catalog, filename):
     """
     Carga los datos del reto
     """
-    movies = csv.DictReader(open(".\\Data\\Challenge-3\\"+filename, encoding='utf-8'))
+    movies = csv.DictReader(open(".\\Data\\"+filename, encoding='utf-8'))
     for elemento in movies:
         
         rta = {}

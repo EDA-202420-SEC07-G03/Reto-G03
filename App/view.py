@@ -33,7 +33,7 @@ def load_data(control):
     catalog = logic.load_data(control,filename)
     print(catalog["accidents"])
     
-    pass
+    
 
 
 def print_data(control, id):
