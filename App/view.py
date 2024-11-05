@@ -3,6 +3,7 @@ from App import logic as logic
 from itertools import islice
 from DataStructures.List import array_list as lt
 from DataStructures.Map import map_linear_probing as mp
+from DataStructures.Tree import red_black_tree as rbt
 import time
 
 def new_logic():
@@ -31,6 +32,7 @@ def load_data(control):
     """
     filename = input("Ingrese el nombre del archivo (con el .csv): ")
     catalog = logic.load_data(control,filename)
+    print('La alruta del arbol es: ' + str(rbt.height(control['fecha'])))
 
     
     
