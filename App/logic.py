@@ -5,25 +5,45 @@ from DataStructures.List import array_list as lt
 from DataStructures.Map import map_linear_probing as mp
 from DataStructures.Map import map_functions as mf
 from DataStructures.Tree import red_black_tree as rb
+from datetime import datetime
+#fecha_str = "2016-04-19 14:43:51"
+def fecha_segundos(fecha_str):
+
+
+  fecha_obj = datetime.strptime(fecha_str, "%Y-%m-%d %H:%M:%S")
+  segundos = int(fecha_obj.timestamp())
+  return segundos
 def new_logic():
     """
     Crea el catalogo para almacenar las estructuras de datos
     """
-    catalog = {"accidents":None}
+    catalog = {"accidents":None,"fecha":None}
     catalog["accidents"] = lt.new_list()
+    catalog["fecha"]=rb.new_map()
     
     return catalog
 
 
 # Funciones para la carga de datos
+def carga_by_años(arbol,dic):
+    segundos=fecha_segundos(dic['Start_Time'])
+    if rb.contains(arbol,segundos):
+        valor=rb.get(arbol,segundos)
+        lt.add_last(valor,dic)
+        rb.put(arbol,segundos,valor)
+    else:
+        k=lt.new_list()
+        lt.add_last(k,dic)
+        rb.put(arbol,segundos,k)
 
 def load_data(catalog, filename):
+    
     """
     Carga los datos del reto
     """
-    movies = csv.DictReader(open(".\\Data\\"+filename, encoding='utf-8'))
+    movies = csv.DictReader(open("Reto-G03/Data/Challenge-3/"+filename, encoding='utf-8'))
     for elemento in movies:
-        
+         
         rta = {}
         rta['ID'] = elemento['ID']
         rta['Source'] =  elemento['Source']
@@ -49,9 +69,11 @@ def load_data(catalog, filename):
         rta['Wind_Speed(mph)'] = elemento['Wind_Speed(mph)']
         rta['Precipitation(in)'] = elemento['Precipitation(in)']
         rta['Weather_Condition'] = elemento['Weather_Condition']
+        carga_by_años(catalog["fecha"],rta)
         lt.add_last(catalog["accidents"],rta)
+
     return catalog
-    
+   
 
 # Funciones de consulta sobre el catálogo
 

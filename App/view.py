@@ -31,7 +31,7 @@ def load_data(control):
     """
     filename = input("Ingrese el nombre del archivo (con el .csv): ")
     catalog = logic.load_data(control,filename)
-    print(catalog["accidents"])
+
     
     
 
