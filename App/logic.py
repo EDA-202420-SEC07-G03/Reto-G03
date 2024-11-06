@@ -31,11 +31,12 @@ def carga_by_años(arbol,dic):
         valor=rb.get(arbol,segundos)
         lt.add_last(valor,dic)
         rb.put(arbol,segundos,valor)
+        
     else:
         k=lt.new_list()
         lt.add_last(k,dic)
         rb.put(arbol,segundos,k)
-
+ 
 def load_data(catalog, filename):
     
     """
