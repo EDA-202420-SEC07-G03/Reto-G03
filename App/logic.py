@@ -24,7 +24,7 @@ def new_logic():
     
     return catalog
 
-
+ 
 # Funciones para la carga de datos
 def carga_by_años(arbol,dic):
     segundos=fecha_segundos(dic['Start_Time'])
@@ -32,7 +32,7 @@ def carga_by_años(arbol,dic):
         valor=rb.get(arbol,segundos)
         lt.add_last(valor,dic)
         rb.put(arbol,segundos,valor)
-        arbol["root"]["size"]+=1
+        
         
     else:
         k=lt.new_list()
@@ -118,8 +118,15 @@ def req_4(catalog,fecha_i,fecha_f):
     inic=fecha_segundos(fecha_i)
     finic=fecha_segundos(fecha_f)
     ini=rb.ceiling(arbol,inic)
+    print(ini)
+    
     fini=rb.floor(arbol,finic)
+    print(fini)
     lista=rb.values(arbol,ini,fini)
+    print("Lista jeje")
+    print(lista)
+    print("Lista jeje")
+    """"
 
     dic={}
     for i in range(0,lt.size(lista)):
@@ -128,6 +135,7 @@ def req_4(catalog,fecha_i,fecha_f):
                 if lista["elements"][i]["elements"][j]["Street"] not in dic:
                     k=lista["elements"][i]["elements"][j]["Street"]
                     dic[k]={}
+    """""
 
 
  
