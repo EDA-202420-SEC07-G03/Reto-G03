@@ -32,9 +32,10 @@ def load_data(control):
     """
     filename = input("Ingrese el nombre del archivo (con el .csv): ")
     catalog = logic.load_data(control,filename)
+    print(catalog["fecha"])
 
     
-    
+     
 
 
 def print_data(control, id):
@@ -68,11 +69,8 @@ def print_req_3(control):
     pass
 
 
-def print_req_4(control):
-    """
-        Función que imprime la solución del Requerimiento 4 en consola
-    """
-    # TODO: Imprimir el resultado del requerimiento 4
+def print_req_4(sol):
+    print(sol)
     pass
 
 
@@ -134,7 +132,10 @@ def main():
             print_req_3(control)
 
         elif int(inputs) == 5:
-            print_req_4(control)
+            ini = input('Ingrese la fecha inicial del periodo a consultar (en formato YYYY-MM-DD): ')
+            fini = input('Ingrese la fecha final del periodo a consultar (en formato YYYY-MM-DD): ')
+            sol=logic.req_4(control,ini,fini)
+            print_req_4(sol)
 
         elif int(inputs) == 6:
             print_req_5(control)

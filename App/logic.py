@@ -7,6 +7,7 @@ from DataStructures.Map import map_functions as mf
 from DataStructures.Tree import red_black_tree as rb
 from datetime import datetime
 #fecha_str = "2016-04-19 14:43:51"
+#"Reto-G03/Data/Challenge-3/"
 def fecha_segundos(fecha_str):
 
 
@@ -27,10 +28,11 @@ def new_logic():
 # Funciones para la carga de datos
 def carga_by_años(arbol,dic):
     segundos=fecha_segundos(dic['Start_Time'])
-    if rb.contains(arbol,segundos):
+    if rb.contains(arbol,segundos)==True:
         valor=rb.get(arbol,segundos)
         lt.add_last(valor,dic)
         rb.put(arbol,segundos,valor)
+        arbol["root"]["size"]+=1
         
     else:
         k=lt.new_list()
@@ -42,7 +44,8 @@ def load_data(catalog, filename):
     """
     Carga los datos del reto
     """
-    movies = csv.DictReader(open(".\\Data\\"+filename, encoding='utf-8'))
+    
+    movies = csv.DictReader(open("Reto-G03/Data/Challenge-3/"+filename, encoding='utf-8'))
     for elemento in movies:
          
         rta = {}
@@ -110,13 +113,24 @@ def req_3(catalog):
     pass
 
 
-def req_4(catalog):
-    """
-    Retorna el resultado del requerimiento 4
-    """
-    # TODO: Modificar el requerimiento 4
-    pass
+def req_4(catalog,fecha_i,fecha_f):
+    arbol=catalog["fecha"]
+    inic=fecha_segundos(fecha_i)
+    finic=fecha_segundos(fecha_f)
+    ini=rb.ceiling(arbol,inic)
+    fini=rb.floor(arbol,finic)
+    lista=rb.values(arbol,ini,fini)
 
+    dic={}
+    for i in range(0,lt.size(lista)):
+        for j in range(0,lt.size(lista["elements"][i])):
+            if lista["elements"][i]["elements"][j]["Severity"]>=3 and lista["elements"][i]["elements"][j]["Visibility(mi)"]<1 and fecha_segundos(lista["elements"][i]["elements"][j]["End_Time"])<=finic:
+                if lista["elements"][i]["elements"][j]["Street"] not in dic:
+                    k=lista["elements"][i]["elements"][j]["Street"]
+                    dic[k]={}
+
+
+ 
 
 def req_5(catalog):
     """
