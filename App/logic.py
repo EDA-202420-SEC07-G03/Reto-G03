@@ -124,7 +124,8 @@ def req_4(catalog,fecha_i,fecha_f):
     print(fini)
     lista=rb.values(arbol,ini,fini)
     print("Lista jeje")
-    print(lista)
+    return lista
+    #print(lista)
     print("Lista jeje")
     """"
 
