@@ -97,9 +97,9 @@ def load_data(catalog, filename):
     """
     Carga los datos del reto
     """
+    accidents = csv.DictReader(open(".\\Data\\Challenge-3\\"+filename, encoding='utf-8'))
     
-    movies = csv.DictReader(open("Reto-G03/Data/Challenge-3/"+filename, encoding='utf-8'))
-    for elemento in movies:
+    for elemento in accidents:
          
         rta = {}
         rta['ID'] = elemento['ID']
