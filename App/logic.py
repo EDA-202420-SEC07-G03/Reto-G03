@@ -175,17 +175,14 @@ def req_2(catalog, visibility_range, state_list):
                         severity_str = accident['Severity']
                         state = accident['State']
                         distance_str = accident['Distance(mi)']
-                        
                         if visibility_str and severity_str and state and distance_str:
                             visibility = float(visibility_str)
                             severity = int(severity_str)
                             distance = float(distance_str)
-
                             if severity == 4:
                                 if visibility_range[0] <= visibility <= visibility_range[1]:
                                     if state in state_list:
                                         total_accidentes += 1
-                                        
                                         if state not in resultados_estados:
                                             resultados_estados[state] = {
                                                 'count': 0,
@@ -193,25 +190,18 @@ def req_2(catalog, visibility_range, state_list):
                                                 'total_distance': 0,
                                                 'max_distance': None
                                             }
-                                        
                                         state_data = resultados_estados[state]
                                         state_data['count'] += 1
                                         state_data['total_visibility'] += visibility
                                         state_data['total_distance'] += distance
-
                                         if (state_data['max_distance'] is None or 
                                             distance > float(state_data['max_distance']['Distance(mi)'])):
                                             state_data['max_distance'] = accident
-    
     for state, data in resultados_estados.items():
         data['average_visibility'] = data['total_visibility'] / data['count']
         data['average_distance'] = data['total_distance'] / data['count']
         print(f"Estado: {state}, Promedio de visibilidad: {data['average_visibility']}, Promedio de distancia: {data['average_distance']}")
-
-    sorted_states = sorted(
-        resultados_estados.items(),
-        key=lambda x: (-x[1]['count'], x[1]['average_visibility'])
-    )
+    sorted_states = sorted(resultados_estados.items(),key=lambda x: (-x[1]['count'], x[1]['average_visibility']))
     
     resultado = {
         'total_accidentes': total_accidentes,
@@ -231,14 +221,45 @@ fisin_time = get_time()
 print(delta_time(init_time, fisin_time))
 '''
 
-
-def req_3(catalog):
+def req_3(catalog, n):
     """
     Retorna el resultado del requerimiento 3
     """
-    # TODO: Modificar el requerimiento 3
-    pass
+    n = int(n)
+    accidentes_recientes = []
 
+    for i in range(lt.size(catalog["accidents"])):
+        accidente = lt.get_element(catalog["accidents"], i)
+        visibility_str = accidente.get('Visibility(mi)', '')
+        if visibility_str and accidente.get('Weather_Condition') and accidente['Severity'] in {'3', '4'}:
+            if any(cond in accidente['Weather_Condition'].lower() for cond in ["rain", "snow"]):
+                visibility = float(visibility_str) if visibility_str else float('inf')
+                if visibility < 2:
+                    accidentes_recientes.append(accidente)
+    accidentes_recientes.sort(
+        key=lambda x: (datetime.strptime(x['Start_Time'], "%Y-%m-%d %H:%M:%S"),-int(x['Severity'])), reverse=True
+    )
+    
+    accidentes_recientes = accidentes_recientes[:n]
+    visibilidad_total = sum(float(a['Visibility(mi)']) for a in accidentes_recientes if a.get('Visibility(mi)'))
+    visibilidad_promedio = visibilidad_total / len(accidentes_recientes) if accidentes_recientes else 0
+
+    resultado = {
+        "average_visibility": visibilidad_promedio,
+        "accidents": accidentes_recientes
+    }
+
+    return resultado
+
+'''
+n = 
+catalog = new_logic() 
+       
+init_time = get_time()
+req_3(catalog, n)   
+fisin_time = get_time()
+print(delta_time(init_time, fisin_time))
+'''
 
 def req_4(catalog,fecha_i,fecha_f):
     arbol=catalog["fecha"]
@@ -287,19 +308,205 @@ fisin_time = get_time()
 print(delta_time(init_time, fisin_time))
 '''
 
-def req_5(catalog):
+def req_5(catalog,fecha_inicio,fecha_fin,condiciones_climaticas):
     """
     Retorna el resultado del requerimiento 5
     """
-    # TODO: Modificar el requerimiento 5
-    pass
+        
+    inicio_seg = fecha_segundos(fecha_inicio + " 00:00:00")
+    fin_seg = fecha_segundos(fecha_fin + " 23:59:59")
 
-def req_6(catalog):
+    inicio = rb.ceiling(catalog['fecha'], inicio_seg)
+    fin = rb.floor(catalog['fecha'], fin_seg)
+    if inicio is None or fin is None:
+        print("No se encontraron accidentes en el rango de fechas especificado.")
+        return None
+    
+    accidentes_en_rango = rb.values(catalog["fecha"], inicio, fin)
+    
+    franjas = {
+        "Mañana": {"total": 0, "severidad_suma": 0, "condiciones": {}},
+        "Tarde": {"total": 0, "severidad_suma": 0, "condiciones": {}},
+        "Noche": {"total": 0, "severidad_suma": 0, "condiciones": {}},
+        "Madrugada": {"total": 0, "severidad_suma": 0, "condiciones": {}}
+    }
+  
+    for lista_accidentes in accidentes_en_rango['elements']:  
+        for accidente in lista_accidentes['elements']:  
+             
+            if accidente['Severity'] == '3' or accidente['Severity'] == '4':
+                if accidente['Weather_Condition'] in condiciones_climaticas:
+                           
+                    start_time = datetime.strptime(accidente['Start_Time'], "%Y-%m-%d %H:%M:%S")
+                    franja = obtener_franja_horaria(start_time.hour)
+                            
+
+                            
+                    franjas[franja]["total"] += 1
+                    franjas[franja]["severidad_suma"] += int(accidente['Severity'])
+
+                        
+                    condicion = accidente['Weather_Condition'].lower()
+                    if condicion in franjas[franja]["condiciones"]:
+                        franjas[franja]["condiciones"][condicion] += 1
+                    else:
+                        franjas[franja]["condiciones"][condicion] = 1
+
+    
+    resultados = lt.new_list()
+    for franja, datos in franjas.items():
+        if datos["total"] > 0:
+            promedio_severidad = datos["severidad_suma"] / datos["total"]
+
+            
+            condicion_predominante = max(datos["condiciones"], key=datos["condiciones"].get)
+
+            lt.add_last(resultados, {
+                "franja_horaria": franja,
+                "total_accidentes": datos["total"],
+                "promedio_severidad": promedio_severidad,
+                "condicion_predominante": condicion_predominante
+            })
+    resultados_ordenados = lt.quick_sort(resultados,sort_crit)
+    
+    return resultados_ordenados
+
+def obtener_franja_horaria(hora):
+    """
+    Clasifica la hora en la franja horaria correspondiente.
+    """
+    if 6 <= hora < 12:
+        return "Mañana"
+    elif 12 <= hora < 18:
+        return "Tarde"
+    elif 18 <= hora < 24:
+        return "Noche"
+    else:
+        return "Madrugada"
+    
+def sort_crit(accidente1, accidente2):
+    
+    if accidente1['total_accidentes'] > accidente2['total_accidentes']:
+        return -1  
+    elif accidente1['total_accidentes'] < accidente2['total_accidentes']:
+        return 1  
+    
+    
+    if accidente1['promedio_severidad'] > accidente2['promedio_severidad']:
+        return -1  
+    elif accidente1['promedio_severidad'] < accidente2['promedio_severidad']:
+        return 1  
+    
+    return 0  
+
+def req_6(catalog,fecha_inicio, fecha_fin, humedad_minima, lista_condados):
     """
     Retorna el resultado del requerimiento 6
     """
-    # TODO: Modificar el requerimiento 6
-    pass
+    
+    inicio_seg = fecha_segundos(fecha_inicio + " 00:00:00")
+    fin_seg = fecha_segundos(fecha_fin + " 23:59:59")
+
+    
+    inicio = rb.ceiling(catalog['fecha'], inicio_seg)
+    fin = rb.floor(catalog['fecha'], fin_seg)
+
+
+    
+    if inicio is None or fin is None:
+        print("No se encontraron accidentes en el rango de fechas especificado.")
+        return None
+
+    
+    estadisticas_por_condado = {}
+
+    
+    accidentes_en_rango = rb.values(catalog["fecha"], inicio, fin)
+
+
+
+    
+    for lista_accidentes in accidentes_en_rango['elements']:
+        for accidente in lista_accidentes['elements']:
+            
+            if accidente['Severity'] == "3" or accidente['Severity'] == "4":
+                if accidente['Humidity(%)'] != '' and accidente['Humidity(%)'] is not None:
+                    humedad = float(accidente['Humidity(%)'])
+                    condado = accidente['County']
+                    
+                
+                    if humedad >= humedad_minima and condado in lista_condados:
+                        
+            
+                        if condado not in estadisticas_por_condado:
+                                
+                                estadisticas_por_condado[condado] = {
+                                    "total_accidentes": 0,
+                                    "temperatura_suma": 0,
+                                    "humedad_suma": 0,
+                                    "viento_suma": 0,
+                                    "distancia_suma": 0,
+                                    "accidente_mas_grave": None,
+                                    "max_severidad": -1
+                                }
+
+                            
+                        estadisticas_por_condado[condado]["total_accidentes"] += 1
+                        if accidente['Temperature(F)'] != '' and accidente['Temperature(F)'] is not None:
+                                estadisticas_por_condado[condado]["temperatura_suma"] += float(accidente['Temperature(F)'])
+                        if accidente['Humidity(%)'] != '' and accidente['Humidity(%)'] is not None:
+                                estadisticas_por_condado[condado]["humedad_suma"] += float(accidente['Humidity(%)'])
+                        if accidente['Wind_Speed(mph)'] != '' and accidente['Wind_Speed(mph)'] is not None:
+                                estadisticas_por_condado[condado]["viento_suma"] += float(accidente['Wind_Speed(mph)'])
+                        if accidente['Distance(mi)'] != '' and accidente['Distance(mi)'] is not None:
+                                estadisticas_por_condado[condado]["distancia_suma"] += float(accidente['Distance(mi)'])
+
+                            
+                        if int(accidente['Severity']) > estadisticas_por_condado[condado]["max_severidad"]:
+                                estadisticas_por_condado[condado]["max_severidad"] = int(accidente['Severity'])
+                                estadisticas_por_condado[condado]["accidente_mas_grave"] = {
+                                    "ID": accidente['ID'],
+                                    "Fecha": accidente['Start_Time'],
+                                    "Temperatura": accidente['Temperature(F)'],
+                                    "Humedad": accidente['Humidity(%)'],
+                                    "Distancia": accidente['Distance(mi)'],
+                                    "Descripción": accidente['Description']
+                                }
+
+    
+    resultados = lt.new_list()
+    for condado, datos in estadisticas_por_condado.items():
+        if datos["total_accidentes"] > 0:
+            
+            promedio_temperatura = datos["temperatura_suma"] / datos["total_accidentes"]
+            promedio_humedad = datos["humedad_suma"] / datos["total_accidentes"]
+            promedio_viento = datos["viento_suma"] / datos["total_accidentes"]
+            promedio_distancia = datos["distancia_suma"] / datos["total_accidentes"]
+
+            
+            lt.add_last(resultados, {
+                "condado": condado,
+                "total_accidentes": datos["total_accidentes"],
+                "promedio_temperatura": promedio_temperatura,
+                "promedio_humedad": promedio_humedad,
+                "promedio_viento": promedio_viento,
+                "promedio_distancia": promedio_distancia,
+                "accidente_mas_grave": datos["accidente_mas_grave"]
+            })
+
+    
+    resultados_ordenados = lt.quick_sort(resultados, sort_por_accidentes)
+    return resultados_ordenados
+
+def sort_por_accidentes(dato1, dato2):
+    """
+    Criterio de ordenación por número de accidentes graves en el condado.
+    """
+    if dato1['total_accidentes'] > dato2['total_accidentes']:
+        return -1
+    elif dato1['total_accidentes'] < dato2['total_accidentes']:
+        return 1
+    return 0
 
 
 def req_7(catalog,lami,lamax,lomi,lomax):
