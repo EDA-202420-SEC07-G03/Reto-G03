@@ -96,7 +96,7 @@ def load_data(catalog, filename):
     Carga los datos del reto
     """
     
-    movies = csv.DictReader(open(".\\Data\\"+filename, encoding='utf-8'))
+
     movies = csv.DictReader(open(".\\Data\\Challenge-3\\"+filename, encoding='utf-8'))
     for elemento in movies:
          
@@ -306,7 +306,7 @@ fisin_time = get_time()
 print(delta_time(init_time, fisin_time))
 '''
 
-def req_5(catalog):
+def req_5(catalog,fecha_inicio,fecha_fin,condiciones_climaticas):
     """
     Retorna el resultado del requerimiento 5
     """
@@ -401,8 +401,111 @@ def req_6(catalog,fecha_inicio, fecha_fin, humedad_minima, lista_condados):
     """
     Retorna el resultado del requerimiento 6
     """
-    # TODO: Modificar el requerimiento 6
-    pass
+    
+    inicio_seg = fecha_segundos(fecha_inicio + " 00:00:00")
+    fin_seg = fecha_segundos(fecha_fin + " 23:59:59")
+
+    
+    inicio = rb.ceiling(catalog['fecha'], inicio_seg)
+    fin = rb.floor(catalog['fecha'], fin_seg)
+
+
+    
+    if inicio is None or fin is None:
+        print("No se encontraron accidentes en el rango de fechas especificado.")
+        return None
+
+    
+    estadisticas_por_condado = {}
+
+    
+    accidentes_en_rango = rb.values(catalog["fecha"], inicio, fin)
+    print(accidentes_en_rango['elements'])
+
+
+    
+    for lista_accidentes in accidentes_en_rango['elements']:
+        for accidente in lista_accidentes['elements']:
+            
+            if accidente['Severity'] == "3" or accidente['Severity'] == "4":
+                if accidente['Humidity(%)'] != '' and accidente['Humidity(%)'] is not None:
+                    humedad = float(accidente['Humidity(%)'])
+                    condado = accidente['County']
+                    
+                
+                    if humedad >= humedad_minima and condado in lista_condados:
+                        print(f"Accidente {accidente['ID']} en {condado} cumple con los criterios.")
+                        
+            
+                        if condado not in estadisticas_por_condado:
+                                
+                                estadisticas_por_condado[condado] = {
+                                    "total_accidentes": 0,
+                                    "temperatura_suma": 0,
+                                    "humedad_suma": 0,
+                                    "viento_suma": 0,
+                                    "distancia_suma": 0,
+                                    "accidente_mas_grave": None,
+                                    "max_severidad": -1
+                                }
+
+                            
+                        estadisticas_por_condado[condado]["total_accidentes"] += 1
+                        if accidente['Temperature(F)'] != '' and accidente['Temperature(F)'] is not None:
+                                estadisticas_por_condado[condado]["temperatura_suma"] += float(accidente['Temperature(F)'])
+                        if accidente['Humidity(%)'] != '' and accidente['Humidity(%)'] is not None:
+                                estadisticas_por_condado[condado]["humedad_suma"] += float(accidente['Humidity(%)'])
+                        if accidente['Wind_Speed(mph)'] != '' and accidente['Wind_Speed(mph)'] is not None:
+                                estadisticas_por_condado[condado]["viento_suma"] += float(accidente['Wind_Speed(mph)'])
+                        if accidente['Distance(mi)'] != '' and accidente['Distance(mi)'] is not None:
+                                estadisticas_por_condado[condado]["distancia_suma"] += float(accidente['Distance(mi)'])
+
+                            
+                        if int(accidente['Severity']) > estadisticas_por_condado[condado]["max_severidad"]:
+                                estadisticas_por_condado[condado]["max_severidad"] = int(accidente['Severity'])
+                                estadisticas_por_condado[condado]["accidente_mas_grave"] = {
+                                    "ID": accidente['ID'],
+                                    "Fecha": accidente['Start_Time'],
+                                    "Temperatura": accidente['Temperature(F)'],
+                                    "Humedad": accidente['Humidity(%)'],
+                                    "Distancia": accidente['Distance(mi)'],
+                                    "Descripción": accidente['Description']
+                                }
+
+    
+    resultados = lt.new_list()
+    for condado, datos in estadisticas_por_condado.items():
+        if datos["total_accidentes"] > 0:
+            
+            promedio_temperatura = datos["temperatura_suma"] / datos["total_accidentes"]
+            promedio_humedad = datos["humedad_suma"] / datos["total_accidentes"]
+            promedio_viento = datos["viento_suma"] / datos["total_accidentes"]
+            promedio_distancia = datos["distancia_suma"] / datos["total_accidentes"]
+
+            
+            lt.add_last(resultados, {
+                "condado": condado,
+                "total_accidentes": datos["total_accidentes"],
+                "promedio_temperatura": promedio_temperatura,
+                "promedio_humedad": promedio_humedad,
+                "promedio_viento": promedio_viento,
+                "promedio_distancia": promedio_distancia,
+                "accidente_mas_grave": datos["accidente_mas_grave"]
+            })
+
+    
+    resultados_ordenados = lt.quick_sort(resultados, sort_por_accidentes)
+    return resultados_ordenados
+
+def sort_por_accidentes(dato1, dato2):
+    """
+    Criterio de ordenación por número de accidentes graves en el condado.
+    """
+    if dato1['total_accidentes'] > dato2['total_accidentes']:
+        return -1
+    elif dato1['total_accidentes'] < dato2['total_accidentes']:
+        return 1
+    return 0
 
 
 def req_7(catalog,lami,lamax,lomi,lomax):
