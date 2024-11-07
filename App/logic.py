@@ -420,7 +420,7 @@ def req_6(catalog,fecha_inicio, fecha_fin, humedad_minima, lista_condados):
 
     
     accidentes_en_rango = rb.values(catalog["fecha"], inicio, fin)
-    print(accidentes_en_rango['elements'])
+
 
 
     
@@ -434,7 +434,6 @@ def req_6(catalog,fecha_inicio, fecha_fin, humedad_minima, lista_condados):
                     
                 
                     if humedad >= humedad_minima and condado in lista_condados:
-                        print(f"Accidente {accidente['ID']} en {condado} cumple con los criterios.")
                         
             
                         if condado not in estadisticas_por_condado:
