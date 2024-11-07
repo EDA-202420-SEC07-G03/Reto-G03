@@ -8,6 +8,23 @@ from DataStructures.Tree import red_black_tree as rb
 from datetime import datetime
 #fecha_str = "2016-04-19 14:43:51"
 #"Reto-G03/Data/Challenge-3/"
+
+#Funciones para medir los tiempos de ejecución
+
+def get_time():
+    """
+    devuelve el instante tiempo de procesamiento en milisegundos
+    """
+    return float(time.perf_counter()*1000)
+
+
+def delta_time(start, end):
+    """
+    devuelve la diferencia entre tiempos de procesamiento muestreados
+    """
+    elapsed = float(end - start)
+    return elapsed 
+
 def fecha_segundos(fecha_str):
 
 
@@ -79,7 +96,7 @@ def load_data(catalog, filename):
     Carga los datos del reto
     """
     
-    movies = csv.DictReader(open("Reto-G03/Data/Challenge-3/"+filename, encoding='utf-8'))
+    movies = csv.DictReader(open(".\\Data\\Challenge-3\\"+filename, encoding='utf-8'))
     for elemento in movies:
          
         rta = {}
@@ -113,7 +130,14 @@ def load_data(catalog, filename):
         lt.add_last(catalog["accidents"],rta)
 
     return catalog
-   
+
+'''
+catalog = new_logic()        
+init_time = get_time()
+load_data(catalog, "accidents-large.csv")        
+fisin_time = get_time()
+print(delta_time(init_time, fisin_time))
+'''
 
 # Funciones de consulta sobre el catálogo
 
@@ -133,12 +157,78 @@ def req_1(catalog):
     pass
 
 
-def req_2(catalog):
+def req_2(catalog, visibility_range, state_list):
     """
     Retorna el resultado del requerimiento 2
     """
-    # TODO: Modificar el requerimiento 2
-    pass
+    resultados_estados = {}
+    total_accidentes = 0
+    
+    for i in range(lt.size(catalog["accidents"])):
+        accident = lt.get_element(catalog["accidents"], i)
+        if 'Visibility(mi)' in accident:
+            if 'Severity' in accident:
+                if 'State' in accident:
+                    if 'Distance(mi)' in accident:                        
+                        visibility_str = accident['Visibility(mi)']
+                        severity_str = accident['Severity']
+                        state = accident['State']
+                        distance_str = accident['Distance(mi)']
+                        
+                        if visibility_str and severity_str and state and distance_str:
+                            visibility = float(visibility_str)
+                            severity = int(severity_str)
+                            distance = float(distance_str)
+
+                            if severity == 4:
+                                if visibility_range[0] <= visibility <= visibility_range[1]:
+                                    if state in state_list:
+                                        total_accidentes += 1
+                                        
+                                        if state not in resultados_estados:
+                                            resultados_estados[state] = {
+                                                'count': 0,
+                                                'total_visibility': 0,
+                                                'total_distance': 0,
+                                                'max_distance': None
+                                            }
+                                        
+                                        state_data = resultados_estados[state]
+                                        state_data['count'] += 1
+                                        state_data['total_visibility'] += visibility
+                                        state_data['total_distance'] += distance
+
+                                        if (state_data['max_distance'] is None or 
+                                            distance > float(state_data['max_distance']['Distance(mi)'])):
+                                            state_data['max_distance'] = accident
+    
+    for state, data in resultados_estados.items():
+        data['average_visibility'] = data['total_visibility'] / data['count']
+        data['average_distance'] = data['total_distance'] / data['count']
+        print(f"Estado: {state}, Promedio de visibilidad: {data['average_visibility']}, Promedio de distancia: {data['average_distance']}")
+
+    sorted_states = sorted(
+        resultados_estados.items(),
+        key=lambda x: (-x[1]['count'], x[1]['average_visibility'])
+    )
+    
+    resultado = {
+        'total_accidentes': total_accidentes,
+        'state_analysis': sorted_states
+    }
+
+    return resultado
+
+'''
+visibility_range = 
+state_list = [,,]
+catalog = new_logic()       
+ 
+init_time = get_time()
+req_2(catalog, visibility_range, state_list)        
+fisin_time = get_time()
+print(delta_time(init_time, fisin_time))
+'''
 
 
 def req_3(catalog):
@@ -183,10 +273,16 @@ def req_4(catalog,fecha_i,fecha_f):
         dic[i]["visi"]=dic[i]["visi"]/(dic[i]["total3"]+dic[i]["total4"])
     return dic
 
-    
+'''
+fecha_i = ''
+fecha_f= ''
+catalog = new_logic()        
 
-
- 
+init_time = get_time()
+req_4(catalog,fecha_i,fecha_f)
+fisin_time = get_time()
+print(delta_time(init_time, fisin_time))
+'''
 
 def req_5(catalog):
     """
@@ -222,7 +318,20 @@ def req_7(catalog,lami,lamax,lomi,lomax):
          if lista1["elements"][i]["elements"][j]["ID"] in common_ids:
             lt.add_last(lista3,lista1["elements"][i]["elements"][j])
     return lista3
-    
+
+'''
+lami = 
+lamax = 
+lomi = 
+lomax = 
+catalog = new_logic()        
+
+init_time = get_time()
+req_7(catalog,lami,lamax,lomi,lomax):
+fisin_time = get_time()
+print(delta_time(init_time, fisin_time))
+'''
+
 def req_8(catalog):
     """
     Retorna el resultado del requerimiento 8
@@ -230,19 +339,3 @@ def req_8(catalog):
     # TODO: Modificar el requerimiento 8
     pass
 
-
-# Funciones para medir tiempos de ejecucion
-
-def get_time():
-    """
-    devuelve el instante tiempo de procesamiento en milisegundos
-    """
-    return float(time.perf_counter()*1000)
-
-
-def delta_time(start, end):
-    """
-    devuelve la diferencia entre tiempos de procesamiento muestreados
-    """
-    elapsed = float(end - start)
-    return elapsed

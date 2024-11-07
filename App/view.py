@@ -58,12 +58,30 @@ def print_req_1(control):
     pass
 
 
-def print_req_2(control):
+def print_req_2(control, visibility_range, state_list):
     """
         Función que imprime la solución del Requerimiento 2 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 2
-    pass
+    resultado = logic.req_2(control, visibility_range, state_list)
+
+    print("Total de accidentes que cumplen los criterios de visibilidad y gravedad:", resultado['total_accidentes'])
+
+    print("Análisis por estado:")
+    for state, data in resultado['state_analysis']:
+        print(f"Estado: {state}")
+        print(f"  - Número de accidentes: {data['count']}")
+        print(f"  - Promedio de visibilidad: {data['average_visibility']:.2f} millas")
+        print(f"  - Distancia promedio afectada: {data['average_distance']:.2f} millas")
+
+        max_accident = data['max_distance']
+        if max_accident:
+            print("  - Accidente con mayor distancia afectada:")
+            print(f"      ID: {max_accident['ID']}")
+            print(f"      Fecha de inicio: {max_accident['Start_Time']}")
+            print(f"      Visibilidad: {max_accident['Visibility(mi)']} millas")
+            print(f"      Distancia afectada: {max_accident['Distance(mi)']} millas")
+        else:
+            print("  - No se encontraron accidentes con distancia afectada para este estado.")
 
 
 def print_req_3(control):
@@ -132,7 +150,12 @@ def main():
             print_req_1(control)
 
         elif int(inputs) == 3:
-            print_req_2(control)
+            visibility_range_input = input('Ingrese el rango de visibilidad: ')
+            state_list_input = input('Ingrese una lista de estados (por sus abreviaturas): ')
+            visibility_range = tuple(map(float, visibility_range_input.split(',')))
+            state_list = state_list_input.replace(" ", "").split(',')
+            
+            print_req_2(control, visibility_range, state_list)
 
         elif int(inputs) == 4:
             print_req_3(control)
