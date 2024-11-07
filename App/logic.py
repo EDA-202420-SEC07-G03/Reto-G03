@@ -124,11 +124,6 @@ def req_4(catalog,fecha_i,fecha_f):
     print(fini)
     lista=rb.values(arbol,ini,fini)
     print("Lista jeje")
-    return lista
-    #print(lista)
-    print("Lista jeje")
-    """"
-
     dic={}
     for i in range(0,lt.size(lista)):
         for j in range(0,lt.size(lista["elements"][i])):
