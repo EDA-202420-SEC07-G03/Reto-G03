@@ -33,6 +33,11 @@ def load_data(control):
     filename = input("Ingrese el nombre del archivo (con el .csv): ")
     catalog = logic.load_data(control,filename)
     print(catalog["fecha"]["root"]["size"])
+    print(catalog["lat"]["root"]["size"])
+    print(catalog["lon"]["root"]["size"])
+    print(len(catalog["lzt"]))
+    print(len(catalog["lut"]))
+    print(len(catalog["lit"]))
 
     
      
@@ -53,20 +58,55 @@ def print_req_1(control):
     pass
 
 
-def print_req_2(control):
+def print_req_2(control, visibility_range, state_list):
     """
         Función que imprime la solución del Requerimiento 2 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 2
-    pass
+    resultado = logic.req_2(control, visibility_range, state_list)
+
+    print("Total de accidentes que cumplen los criterios de visibilidad y gravedad:", resultado['total_accidentes'])
+
+    print("Análisis por estado:")
+    for state, data in resultado['state_analysis']:
+        print(f"Estado: {state}")
+        print(f"  - Número de accidentes: {data['count']}")
+        print(f"  - Promedio de visibilidad: {data['average_visibility']:.2f} millas")
+        print(f"  - Distancia promedio afectada: {data['average_distance']:.2f} millas")
+
+        max_accident = data['max_distance']
+        if max_accident:
+            print("  - Accidente con mayor distancia afectada:")
+            print(f"      ID: {max_accident['ID']}")
+            print(f"      Fecha de inicio: {max_accident['Start_Time']}")
+            print(f"      Visibilidad: {max_accident['Visibility(mi)']} millas")
+            print(f"      Distancia afectada: {max_accident['Distance(mi)']} millas")
+        else:
+            print("  - No se encontraron accidentes con distancia afectada para este estado.")
 
 
-def print_req_3(control):
+def print_req_3(control, n):
     """
         Función que imprime la solución del Requerimiento 3 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 3
-    pass
+    
+    resultado = logic.req_3(control, n)
+    
+    print("La visibilidad promedio de los accidentes que cumplen con los criterios:", f"{resultado['average_visibility']:.2f} millas")
+
+    print("Listado de accidentes:")
+    for accidente in resultado['accidents']:
+        print(f"  - ID del accidente: {accidente['ID']}")
+        print(f"    Fecha y hora de inicio del accidente: {accidente['Start_Time']}")
+        print(f"    Ciudad y Estado: {accidente['City']}, {accidente['State']}")
+        print(f"    Condición de precipitación reportada: {accidente['Weather_Condition']}")
+        print(f"    Severidad: {accidente['Severity']}")
+        print(f"    Descripción del accidente: {accidente['Description'][:40]}")
+        
+        fecha_inicio = logic.datetime.strptime(accidente['Start_Time'], "%Y-%m-%d %H:%M:%S")
+        fecha_fin = logic.datetime.strptime(accidente['End_Time'], "%Y-%m-%d %H:%M:%S")
+        duracion = (fecha_fin - fecha_inicio).total_seconds() / 3600
+        
+        print(f"    Duración del accidente: {duracion:.2f} horas")
 
 
 def print_req_4(sol):
@@ -97,7 +137,8 @@ def print_req_6(control):
     print(rta)
 
 
-def print_req_7(control):
+def print_req_7(sol):
+    print(sol)
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
@@ -133,10 +174,17 @@ def main():
             print_req_1(control)
 
         elif int(inputs) == 3:
-            print_req_2(control)
+            visibility_range_input = input('Ingrese el rango de visibilidad: ')
+            state_list_input = input('Ingrese una lista de estados (por sus abreviaturas): ')
+            visibility_range = tuple(map(float, visibility_range_input.split(',')))
+            state_list = state_list_input.replace(" ", "").split(',')
+            
+            print_req_2(control, visibility_range, state_list)
 
         elif int(inputs) == 4:
-            print_req_3(control)
+            n = input('Ingrese la cantidad de accidentes que quiere ver: ')
+            
+            print_req_3(control,n)
 
         elif int(inputs) == 5:
             ini = input('Ingrese la fecha inicial del periodo a consultar (en formato YYYY-MM-DD): ')
@@ -151,7 +199,12 @@ def main():
             print_req_6(control)
 
         elif int(inputs) == 8:
-            print_req_7(control)
+            lami = input('Ingrese la latitud minima: ')
+            lamax = input('Ingrese la latitud maxima: ')
+            lomi = input('Ingrese la longitud minima: ')
+            lomax = input('Ingrese la longitud maxima: ')
+            sol=logic.req_7(control,lami,lamax,lomi,lomax)
+            print_req_7(sol)
 
         elif int(inputs) == 9:
             print_req_8(control)
