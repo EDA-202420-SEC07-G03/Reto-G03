@@ -78,16 +78,23 @@ def print_req_5(control):
     """
         Función que imprime la solución del Requerimiento 5 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 5
-    pass
+    fecha_inicio = input("Ingrese la fecha de inicio: ")
+    fecha_fin = input("Ingrese la fecha final: ")
+    condiciones_climaticas = input("Ingrese las condiciones climaticas: ").split()
+    rta = logic.req_5(control, fecha_inicio,fecha_fin,condiciones_climaticas)
+    print(rta)
 
 
 def print_req_6(control):
     """
         Función que imprime la solución del Requerimiento 6 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 6
-    pass
+    fecha_inicio = input("Ingrese la fecha de inicio: ")
+    fecha_fin = input("Ingrese la fecha final: ")
+    humedad = float(input("Ingrese la humedad mínima: "))
+    condados = input("Ingrese los condados a consultar: ").split()
+    rta = logic.req_6(control, fecha_inicio,fecha_fin,humedad,condados)
+    print(rta)
 
 
 def print_req_7(control):
