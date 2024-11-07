@@ -94,7 +94,6 @@ def print_req_3(control):
 
 def print_req_4(sol):
     print(sol)
-    pass
 
 
 def print_req_5(control):
@@ -118,8 +117,6 @@ def print_req_7(sol):
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 7
-    pass
 
 
 def print_req_8(control):

@@ -5,6 +5,7 @@ from DataStructures.List import array_list as lt
 from DataStructures.Map import map_linear_probing as mp
 from DataStructures.Map import map_functions as mf
 from DataStructures.Tree import red_black_tree as rb
+from DataStructures.Tree import binary_search_tree as bs
 from datetime import datetime
 #fecha_str = "2016-04-19 14:43:51"
 #"Reto-G03/Data/Challenge-3/"
@@ -96,7 +97,7 @@ def load_data(catalog, filename):
     Carga los datos del reto
     """
     
-    movies = csv.DictReader(open(".\\Data\\Challenge-3\\"+filename, encoding='utf-8'))
+    movies = csv.DictReader(open("Reto-G03/Data/Challenge-3/"+filename, encoding='utf-8'))
     for elemento in movies:
          
         rta = {}
@@ -254,24 +255,26 @@ def req_4(catalog,fecha_i,fecha_f):
                 k=lista["elements"][i]["elements"][j]["Street"]
                 if k not in dic:
                     if int(lista["elements"][i]["elements"][j]["Severity"])==3:
-                        dic[k]={"city":lista["elements"][i]["elements"][j]["City"],"county":lista["elements"][i]["elements"][j]["County"],"state":lista["elements"][i]["elements"][j]["State"],"pelig":3,"total3":1,"total4":0,"visi":float(lista["elements"][i]["elements"][j]["Visibility(mi)"]),"start":lista["elements"][i]["elements"][j]["Start_Time"],"end":lista["elements"][i]["elements"][j]["End_Time"]} 
+                        dic[k]={"city":lista["elements"][i]["elements"][j]["City"],"county":lista["elements"][i]["elements"][j]["County"],"state":lista["elements"][i]["elements"][j]["State"],"street":k,"pelig":3,"total3":1,"total4":0,"visi":float(lista["elements"][i]["elements"][j]["Visibility(mi)"]),"start":lista["elements"][i]["elements"][j]["Start_Time"],"end":lista["elements"][i]["elements"][j]["End_Time"]} 
                     else:
-                        dic[k]={"city":lista["elements"][i]["elements"][j]["City"],"county":lista["elements"][i]["elements"][j]["County"],"state":lista["elements"][i]["elements"][j]["State"],"pelig":4,"total3":0,"total4":1,"visi":float(lista["elements"][i]["elements"][j]["Visibility(mi)"]),"start":lista["elements"][i]["elements"][j]["Start_Time"],"end":lista["elements"][i]["elements"][j]["End_Time"]} 
+                        dic[k]={"city":lista["elements"][i]["elements"][j]["City"],"county":lista["elements"][i]["elements"][j]["County"],"state":lista["elements"][i]["elements"][j]["State"],"street":k,"pelig":4,"total3":0,"total4":1,"visi":float(lista["elements"][i]["elements"][j]["Visibility(mi)"]),"start":lista["elements"][i]["elements"][j]["Start_Time"],"end":lista["elements"][i]["elements"][j]["End_Time"]} 
                 elif k in dic and dic[k]["city"]==lista["elements"][i]["elements"][j]["City"] and dic[k]["county"]==lista["elements"][i]["elements"][j]["County"]and dic[k]["state"]==lista["elements"][i]["elements"][j]["State"]:
+                    dic[k]["visi"]+=float(lista["elements"][i]["elements"][j]["Visibility(mi)"])
                     if int(lista["elements"][i]["elements"][j]["Severity"])==3:
                         dic[k]["pelig"]+=3
                         dic[k]["total3"]+=1
-                        dic[k]["visi"]+=float(lista["elements"][i]["elements"][j]["Visibility(mi)"])
+                        
                     else:
                         dic[k]["pelig"]+=4
                         dic[k]["total4"]+=1
-                        dic[k]["visi"]+=float(lista["elements"][i]["elements"][j]["Visibility(mi)"])
+                        
 
 
     for i in dic:
         dic[i]["pelig"]=dic[i]["pelig"]/(dic[i]["total3"]+dic[i]["total4"])
         dic[i]["visi"]=dic[i]["visi"]/(dic[i]["total3"]+dic[i]["total4"])
-    return dic
+    ordenado = dict(sorted(dic.items(), key=lambda item: (item[1]['state'], item[1]['county'], item[1]['city'], item[0])))
+    return ordenado
 
 '''
 fecha_i = ''
@@ -302,22 +305,38 @@ def req_6(catalog):
 def req_7(catalog,lami,lamax,lomi,lomax):
     arbol1=catalog["lat"]
     ini1=rb.ceiling(arbol1,float(lami))
-    fini1=rb.floor(arbol1,float(lamax))
+    fini1=bs.max_key(arbol1)
     lista1=rb.values(arbol1,ini1,fini1)
     arbol2=catalog["lon"]
     ini2=rb.ceiling(arbol2,float(lomi))
-    fini2=rb.floor(arbol2,float(lomax))
+    fini2=bs.max_key(arbol2)
     lista2=rb.values(arbol2,ini2,fini2)
     lista3=lt.new_list()
     ids_array1 = {element['ID'] for group in lista1['elements'] for element in group['elements']}
     ids_array2 = {element['ID'] for group in lista2['elements'] for element in group['elements']}
     common_ids = list(ids_array1.intersection(ids_array2))
+    total=0
+    dic={}
     if len(common_ids)>0:
      for i in range(0,lt.size(lista1)):
         for j in range(0,lt.size(lista1["elements"][i])):
          if lista1["elements"][i]["elements"][j]["ID"] in common_ids:
             lt.add_last(lista3,lista1["elements"][i]["elements"][j])
-    return lista3
+    for i in range(0,lt.size(lista3)):
+        if lista3["elements"][i]["End_Lat"]!=''and lista3["elements"][i]["End_Lng"]!='':
+            if float(lista3["elements"][i]["End_Lat"])<float(lamax) and float(lista3["elements"][i]["End_Lng"])<float(lomax):
+                total +=1
+                dic[lista3["elements"][i]["ID"]]=lista3["elements"][i]
+    sorted_data = dict(sorted(
+    dic.items(), 
+    key=lambda item: (
+        float(item[1]['Start_Lat']), 
+        float(item[1]['Start_Lng']), 
+        float(item[1]['End_Lat']), 
+        float(item[1]['End_Lng']))))
+    return dic,total
+
+
 
 '''
 lami = 
