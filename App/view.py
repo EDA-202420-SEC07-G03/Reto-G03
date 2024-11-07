@@ -84,12 +84,29 @@ def print_req_2(control, visibility_range, state_list):
             print("  - No se encontraron accidentes con distancia afectada para este estado.")
 
 
-def print_req_3(control):
+def print_req_3(control, n):
     """
         Función que imprime la solución del Requerimiento 3 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 3
-    pass
+    
+    resultado = logic.req_3(control, n)
+    
+    print("La visibilidad promedio de los accidentes que cumplen con los criterios:", f"{resultado['average_visibility']:.2f} millas")
+
+    print("Listado de accidentes:")
+    for accidente in resultado['accidents']:
+        print(f"  - ID del accidente: {accidente['ID']}")
+        print(f"    Fecha y hora de inicio del accidente: {accidente['Start_Time']}")
+        print(f"    Ciudad y Estado: {accidente['City']}, {accidente['State']}")
+        print(f"    Condición de precipitación reportada: {accidente['Weather_Condition']}")
+        print(f"    Severidad: {accidente['Severity']}")
+        print(f"    Descripción del accidente: {accidente['Description'][:40]}")
+        
+        fecha_inicio = logic.datetime.strptime(accidente['Start_Time'], "%Y-%m-%d %H:%M:%S")
+        fecha_fin = logic.datetime.strptime(accidente['End_Time'], "%Y-%m-%d %H:%M:%S")
+        duracion = (fecha_fin - fecha_inicio).total_seconds() / 3600
+        
+        print(f"    Duración del accidente: {duracion:.2f} horas")
 
 
 def print_req_4(sol):
@@ -158,7 +175,9 @@ def main():
             print_req_2(control, visibility_range, state_list)
 
         elif int(inputs) == 4:
-            print_req_3(control)
+            n = input('Ingrese la cantidad de accidentes que quiere ver: ')
+            
+            print_req_3(control,n)
 
         elif int(inputs) == 5:
             ini = input('Ingrese la fecha inicial del periodo a consultar (en formato YYYY-MM-DD): ')

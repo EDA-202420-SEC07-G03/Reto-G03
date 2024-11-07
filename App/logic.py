@@ -174,17 +174,14 @@ def req_2(catalog, visibility_range, state_list):
                         severity_str = accident['Severity']
                         state = accident['State']
                         distance_str = accident['Distance(mi)']
-                        
                         if visibility_str and severity_str and state and distance_str:
                             visibility = float(visibility_str)
                             severity = int(severity_str)
                             distance = float(distance_str)
-
                             if severity == 4:
                                 if visibility_range[0] <= visibility <= visibility_range[1]:
                                     if state in state_list:
                                         total_accidentes += 1
-                                        
                                         if state not in resultados_estados:
                                             resultados_estados[state] = {
                                                 'count': 0,
@@ -192,25 +189,18 @@ def req_2(catalog, visibility_range, state_list):
                                                 'total_distance': 0,
                                                 'max_distance': None
                                             }
-                                        
                                         state_data = resultados_estados[state]
                                         state_data['count'] += 1
                                         state_data['total_visibility'] += visibility
                                         state_data['total_distance'] += distance
-
                                         if (state_data['max_distance'] is None or 
                                             distance > float(state_data['max_distance']['Distance(mi)'])):
                                             state_data['max_distance'] = accident
-    
     for state, data in resultados_estados.items():
         data['average_visibility'] = data['total_visibility'] / data['count']
         data['average_distance'] = data['total_distance'] / data['count']
         print(f"Estado: {state}, Promedio de visibilidad: {data['average_visibility']}, Promedio de distancia: {data['average_distance']}")
-
-    sorted_states = sorted(
-        resultados_estados.items(),
-        key=lambda x: (-x[1]['count'], x[1]['average_visibility'])
-    )
+    sorted_states = sorted(resultados_estados.items(),key=lambda x: (-x[1]['count'], x[1]['average_visibility']))
     
     resultado = {
         'total_accidentes': total_accidentes,
@@ -230,14 +220,45 @@ fisin_time = get_time()
 print(delta_time(init_time, fisin_time))
 '''
 
-
-def req_3(catalog):
+def req_3(catalog, n):
     """
     Retorna el resultado del requerimiento 3
     """
-    # TODO: Modificar el requerimiento 3
-    pass
+    n = int(n)
+    accidentes_recientes = []
 
+    for i in range(lt.size(catalog["accidents"])):
+        accidente = lt.get_element(catalog["accidents"], i)
+        visibility_str = accidente.get('Visibility(mi)', '')
+        if visibility_str and accidente.get('Weather_Condition') and accidente['Severity'] in {'3', '4'}:
+            if any(cond in accidente['Weather_Condition'].lower() for cond in ["rain", "snow"]):
+                visibility = float(visibility_str) if visibility_str else float('inf')
+                if visibility < 2:
+                    accidentes_recientes.append(accidente)
+    accidentes_recientes.sort(
+        key=lambda x: (datetime.strptime(x['Start_Time'], "%Y-%m-%d %H:%M:%S"),-int(x['Severity'])), reverse=True
+    )
+    
+    accidentes_recientes = accidentes_recientes[:n]
+    visibilidad_total = sum(float(a['Visibility(mi)']) for a in accidentes_recientes if a.get('Visibility(mi)'))
+    visibilidad_promedio = visibilidad_total / len(accidentes_recientes) if accidentes_recientes else 0
+
+    resultado = {
+        "average_visibility": visibilidad_promedio,
+        "accidents": accidentes_recientes
+    }
+
+    return resultado
+
+'''
+n = 
+catalog = new_logic() 
+       
+init_time = get_time()
+req_3(catalog, n)   
+fisin_time = get_time()
+print(delta_time(init_time, fisin_time))
+'''
 
 def req_4(catalog,fecha_i,fecha_f):
     arbol=catalog["fecha"]
