@@ -149,11 +149,22 @@ def print_req_6(control):
 
 
 def print_req_7(sol):
-    print(sol)
-    """
-        Función que imprime la solución del Requerimiento 7 en consola
-    """
+    if len(sol[0])>10:
+     claves = list(sol[0].keys())
+     print("Primeros 5 elementos:")
+     for clave in claves[:5]:
+       print(clave, ":", sol[0][clave])
+     print("\nÚltimos 5 elementos:")
+     for clave in claves[-5:]:
+      print(clave, ":", sol[0][clave])
+    else:
+        print(sol[0])
+    print("El total de elementos es " + str(sol[1]))
+ 
+    
 
+    
+ 
 
 def print_req_8(control):
     """
