@@ -33,6 +33,11 @@ def load_data(control):
     filename = input("Ingrese el nombre del archivo (con el .csv): ")
     catalog = logic.load_data(control,filename)
     print(catalog["fecha"]["root"]["size"])
+    print(catalog["lat"]["root"]["size"])
+    print(catalog["lon"]["root"]["size"])
+    print(len(catalog["lzt"]))
+    print(len(catalog["lut"]))
+    print(len(catalog["lit"]))
 
     
      
@@ -90,7 +95,8 @@ def print_req_6(control):
     pass
 
 
-def print_req_7(control):
+def print_req_7(sol):
+    print(sol)
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
@@ -144,7 +150,12 @@ def main():
             print_req_6(control)
 
         elif int(inputs) == 8:
-            print_req_7(control)
+            lami = input('Ingrese la latitud minima: ')
+            lamax = input('Ingrese la latitud maxima: ')
+            lomi = input('Ingrese la longitud minima: ')
+            lomax = input('Ingrese la longitud maxima: ')
+            sol=logic.req_7(control,lami,lamax,lomi,lomax)
+            print_req_7(sol)
 
         elif int(inputs) == 9:
             print_req_8(control)
