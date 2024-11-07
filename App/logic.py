@@ -6,6 +6,7 @@ from DataStructures.Map import map_linear_probing as mp
 from DataStructures.Map import map_functions as mf
 from DataStructures.Tree import red_black_tree as rb
 from datetime import datetime
+
 #fecha_str = "2016-04-19 14:43:51"
 #"Reto-G03/Data/Challenge-3/"
 
@@ -146,16 +147,77 @@ def get_data(catalog, id):
     """
     Retorna un dato por su ID.
     """
-    #TODO: Consulta en las Llamar la función del modelo para obtener un dato
-    pass
+    info = None
+    for accidente in catalog['accidents']:
+        if accidente['ID'] == id:
+            info = accidente
+    return info
 
 
-def req_1(catalog):
+def req_1(catalog,fecha_inicia,fecha_final):
     """
     Retorna el resultado del requerimiento 1
     """
-    # TODO: Modificar el requerimiento 1
-    pass
+    inicial_segs =  fecha_segundos(fecha_inicia)
+    final_segs = fecha_segundos(fecha_final)
+    inicio = rb.ceiling(catalog['fecha'],inicial_segs)
+    fin = rb.floor(catalog['fecha'],final_segs)
+    
+    if inicio is None or fin is None:
+        print("No se encontraron accidentes en el rango de fechas especificado.")
+        return None
+    
+    accidentes_en_rango = rb.values(catalog['fecha'],inicio,fin)
+    
+    lista_filtrada = lt.new_list()
+    
+    for lista_accidentes in accidentes_en_rango['elements']:
+        for accidente in lista_accidentes['elements']:
+        
+            id_accidente = accidente['ID']
+            fecha_hora_inicio = accidente['Start_Time']
+            ciudad = accidente['City']
+            estado = accidente['State']
+            descripcion = accidente['Description'][:40] 
+            
+            inicio = datetime.strptime(accidente['Start_Time'], "%Y-%m-%d %H:%M:%S")
+            final = datetime.strptime(accidente['End_Time'], "%Y-%m-%d %H:%M:%S")
+            duracion_horas = (final - inicio).total_seconds() / 3600
+
+            
+            lt.add_last(lista_filtrada,{
+                "ID": id_accidente,
+                "Fecha y Hora de Inicio": fecha_hora_inicio,
+                "Ciudad": ciudad,
+                "Estado": estado,
+                "Descripción": descripcion,
+                "Duración en horas": duracion_horas
+            })
+            
+    lista_ordenada = lt.merge_sort(lista_filtrada,sort_por_fecha_y_severidad)
+    
+    return lista_ordenada
+            
+            
+            
+    
+def sort_por_fecha_y_severidad(accidente1, accidente2):
+    
+    fecha1 = datetime.strptime(accidente1['Fecha y Hora de Inicio'], "%Y-%m-%d %H:%M:%S")
+    fecha2 = datetime.strptime(accidente2['Fecha y Hora de Inicio'], "%Y-%m-%d %H:%M:%S")
+
+    if fecha1 > fecha2:
+        return -1
+    elif fecha1 < fecha2:
+        return 1
+
+    
+    if int(accidente1.get('Severity', 0)) > int(accidente2.get('Severity', 0)):
+        return -1
+    elif int(accidente1.get('Severity', 0)) < int(accidente2.get('Severity', 0)):
+        return 1
+
+    return 0    
 
 
 def req_2(catalog, visibility_range, state_list):
@@ -370,9 +432,7 @@ def req_5(catalog,fecha_inicio,fecha_fin,condiciones_climaticas):
     return resultados_ordenados
 
 def obtener_franja_horaria(hora):
-    """
-    Clasifica la hora en la franja horaria correspondiente.
-    """
+   
     if 6 <= hora < 12:
         return "Mañana"
     elif 12 <= hora < 18:
@@ -497,9 +557,7 @@ def req_6(catalog,fecha_inicio, fecha_fin, humedad_minima, lista_condados):
     return resultados_ordenados
 
 def sort_por_accidentes(dato1, dato2):
-    """
-    Criterio de ordenación por número de accidentes graves en el condado.
-    """
+  
     if dato1['total_accidentes'] > dato2['total_accidentes']:
         return -1
     elif dato1['total_accidentes'] < dato2['total_accidentes']:

@@ -6,6 +6,9 @@ from DataStructures.Map import map_linear_probing as mp
 from DataStructures.Tree import red_black_tree as rbt
 import time
 
+default_limit = 1000
+sys.setrecursionlimit(default_limit*10)
+
 def new_logic():
     """
         Se crea una instancia del controlador
@@ -32,12 +35,11 @@ def load_data(control):
     """
     filename = input("Ingrese el nombre del archivo (con el .csv): ")
     catalog = logic.load_data(control,filename)
-    print(catalog["fecha"]["root"]["size"])
-    print(catalog["lat"]["root"]["size"])
-    print(catalog["lon"]["root"]["size"])
-    print(len(catalog["lzt"]))
-    print(len(catalog["lut"]))
-    print(len(catalog["lit"]))
+    print('se han cargado ' + str(catalog['accidents']['size']) + " accidentes.")
+    print('Los primeros 5 accidentes cargados son: ')
+    print(catalog['accidents']['elements'][:5])
+    print('Los últimos 5 accidentes cargados son: ')
+    print(catalog['accidents']['elements'][-5:])
 
     
      
@@ -47,15 +49,25 @@ def print_data(control, id):
     """
         Función que imprime un dato dado su ID
     """
-    #TODO: Realizar la función para imprimir un elemento
-    pass
+    id = input("Ingrese el ID del accidente que desea buscar: ")
+    rta = logic.get_data(control,id)
+    print(rta)
 
-def print_req_1(control):
+def print_req_1(control,fecha_inicio,fecha_fin):
     """
         Función que imprime la solución del Requerimiento 1 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 1
-    pass
+
+    rta = logic.req_1(control,fecha_inicio,fecha_fin)
+    print('Para el intervalo de fechas dado hay ' + str(rta['size']) + " accidentes")
+    if rta['size'] > 10:
+        print("Los primeros 5 accidentes son: ")
+        print(rta['elements'][:6])
+        print('Los últimos 5 accidentes son: ')
+        print(rta['elements'][-5:])
+    else:
+        print(rta)
+    
 
 
 def print_req_2(control, visibility_range, state_list):
@@ -171,7 +183,10 @@ def main():
             print("Cargando información de los archivos ....\n")
             data = load_data(control)
         elif int(inputs) == 2:
-            print_req_1(control)
+            fecha_inicio = input("Ingrese la fecha de inicio (Formato %Y-%m-%d %H:%M:%S): ")
+            fecha_fin = input("Ingrese la fecha final (Formato %Y-%m-%d %H:%M:%S): ")
+            print_req_1(control, fecha_inicio, fecha_fin)
+        
 
         elif int(inputs) == 3:
             visibility_range_input = input('Ingrese el rango de visibilidad: ')
