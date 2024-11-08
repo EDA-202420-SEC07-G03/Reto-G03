@@ -556,8 +556,9 @@ def req_7(catalog,lami,lamax,lomi,lomax):
             lt.add_last(lista3,lista1["elements"][i]["elements"][j])
     for i in range(0,lt.size(lista3)):
         if lista3["elements"][i]["End_Lat"]!=''and lista3["elements"][i]["End_Lng"]!='':
-            if float(lista3["elements"][i]["End_Lat"])<float(lamax) and float(lista3["elements"][i]["End_Lng"])<float(lomax):
+            if float(lami)<=float(lista3["elements"][i]["End_Lat"])<=float(lamax) and float(lomi)<=float(lista3["elements"][i]["End_Lng"])<=float(lomax) and float(lista3["elements"][i]["Start_Lat"])<=float(lamax) and float(lista3["elements"][i]["Start_Lng"])<=float(lomax):
                 total +=1
+                lista3["elements"][i]["duracion"]=(fecha_segundos(lista3["elements"][i]["End_Time"])/3600)-(fecha_segundos(lista3["elements"][i]["Start_Time"])/3600)
                 dic[lista3["elements"][i]["ID"]]=lista3["elements"][i]
     sorted_data = dict(sorted(
     dic.items(), 
@@ -566,7 +567,7 @@ def req_7(catalog,lami,lamax,lomi,lomax):
         float(item[1]['Start_Lng']), 
         float(item[1]['End_Lat']), 
         float(item[1]['End_Lng']))))
-    return dic,total
+    return sorted_data,total
 
 
 
