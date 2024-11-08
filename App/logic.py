@@ -8,8 +8,7 @@ from DataStructures.Tree import red_black_tree as rb
 from DataStructures.Tree import binary_search_tree as bs
 from datetime import datetime
 
-#fecha_str = "2016-04-19 14:43:51"
-#"Reto-G03/Data/Challenge-3/"
+
 
 #Funciones para medir los tiempos de ejecución
 
@@ -133,13 +132,6 @@ def load_data(catalog, filename):
 
     return catalog
 
-'''
-catalog = new_logic()        
-init_time = get_time()
-load_data(catalog, "accidents-large.csv")        
-fisin_time = get_time()
-print(delta_time(init_time, fisin_time))
-'''
 
 # Funciones de consulta sobre el catálogo
 
@@ -272,16 +264,8 @@ def req_2(catalog, visibility_range, state_list):
 
     return resultado
 
-'''
-visibility_range = 
-state_list = [,,]
-catalog = new_logic()       
- 
-init_time = get_time()
-req_2(catalog, visibility_range, state_list)        
-fisin_time = get_time()
-print(delta_time(init_time, fisin_time))
-'''
+
+
 
 def req_3(catalog, n):
     """
@@ -313,15 +297,7 @@ def req_3(catalog, n):
 
     return resultado
 
-'''
-n = 
-catalog = new_logic() 
-       
-init_time = get_time()
-req_3(catalog, n)   
-fisin_time = get_time()
-print(delta_time(init_time, fisin_time))
-'''
+
 
 def req_4(catalog,fecha_i,fecha_f):
     arbol=catalog["fecha"]
@@ -359,16 +335,7 @@ def req_4(catalog,fecha_i,fecha_f):
     ordenado = dict(sorted(dic.items(), key=lambda item: (item[1]['state'], item[1]['county'], item[1]['city'], item[0])))
     return ordenado
 
-'''
-fecha_i = ''
-fecha_f= ''
-catalog = new_logic()        
 
-init_time = get_time()
-req_4(catalog,fecha_i,fecha_f)
-fisin_time = get_time()
-print(delta_time(init_time, fisin_time))
-'''
 
 def req_5(catalog,fecha_inicio,fecha_fin,condiciones_climaticas):
     """
@@ -603,18 +570,7 @@ def req_7(catalog,lami,lamax,lomi,lomax):
 
 
 
-'''
-lami = 
-lamax = 
-lomi = 
-lomax = 
-catalog = new_logic()        
 
-init_time = get_time()
-req_7(catalog,lami,lamax,lomi,lomax):
-fisin_time = get_time()
-print(delta_time(init_time, fisin_time))
-'''
 
 def req_8(catalog):
     """
